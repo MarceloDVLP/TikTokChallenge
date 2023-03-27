@@ -1,7 +1,7 @@
 import UIKit
 import AVFoundation
 
-final class PhotoCell: UICollectionViewCell {
+final class VideoCell: UICollectionViewCell {
 
     var updateCell: ((VideoItem, UIImage) -> ())?
     
