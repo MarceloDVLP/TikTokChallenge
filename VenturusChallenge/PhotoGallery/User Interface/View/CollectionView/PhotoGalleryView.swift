@@ -24,13 +24,12 @@ final class PhotoGalleryView: UIView {
         super.init(frame: frame)
         collectionView.delegate = self
         collectionView.pinView(in: self)
+        collectionView.isPagingEnabled = true
     }
     
     func cellRegistration() -> UICollectionView.CellRegistration<PhotoCell, VideoItem> {
         return UICollectionView.CellRegistration<PhotoCell, VideoItem> { (cell, indexPath, item) in
-            
             cell.load(with: item)
-            
             cell.updateCell = { [weak self] item, img in
 
                 guard let self = self else { return }
@@ -60,7 +59,7 @@ final class PhotoGalleryView: UIView {
     }
     
     func show(_ items: [VideoItem]) {
-        self.items = [items.first!]
+        self.items = items
         applySnapshot(animatingDifferences: true)
     }
     
@@ -71,33 +70,6 @@ final class PhotoGalleryView: UIView {
         
         // Section
         let section = NSCollectionLayoutSection(group: group)
-        return UICollectionViewCompositionalLayout(section: section)
-    }
-    
-    func makeLayout() -> UICollectionViewLayout {
-        let inset: CGFloat = 2.5
-        
-        // Items
-        let largeItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/3), heightDimension: .fractionalHeight(1))
-        let largeItem = NSCollectionLayoutItem(layoutSize: largeItemSize)
-        largeItem.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
-        
-        let smallItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(0.5))
-        let smallItem = NSCollectionLayoutItem(layoutSize: smallItemSize)
-        smallItem.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
-        
-        // Nested Group
-        let nestedGroupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/3), heightDimension: .fractionalHeight(1))
-        let nestedGroup = NSCollectionLayoutGroup.vertical(layoutSize: nestedGroupSize, subitems: [smallItem])
-        
-        // Outer Group
-        let outerGroupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalWidth(0.7))
-        let outerGroup = NSCollectionLayoutGroup.horizontal(layoutSize: outerGroupSize, subitems: [largeItem, nestedGroup, nestedGroup])
-        
-        // Section
-        let section = NSCollectionLayoutSection(group: outerGroup)
-        section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
-                 
         return UICollectionViewCompositionalLayout(section: section)
     }
     
@@ -122,25 +94,3 @@ final class PhotoGalleryView: UIView {
         fatalError()
     }
 }
-
-extension PhotoGalleryView: UICollectionViewDelegate {
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let item = dataSource.itemIdentifier(for: indexPath) else {
-          return
-        }
-        didSelect?(item)
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let didScroll = (scrollView.contentOffset.y) >= (scrollView.contentSize.height - scrollView.bounds.size.height)
-        let hasOnlyLoadingItems = self.items.allSatisfy({ type(of: $0) == PhotoLoading.self })
-                                    
-        if (didScroll) && (!hasOnlyLoadingItems) {
-//            showLoadingItems()
-//            didScrollToTheEnd?()
-       }
-   }
-}
-
-

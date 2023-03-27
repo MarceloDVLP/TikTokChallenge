@@ -5,9 +5,10 @@ final class PhotoCell: UICollectionViewCell {
 
     var updateCell: ((VideoItem, UIImage) -> ())?
     
-    var player: AVPlayer?
     var playerView: UIView = UIView()
+    var player: AVQueuePlayer!
     var playerLayer: AVPlayerLayer?
+    var playerLooper: AVPlayerLooper!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,16 +22,35 @@ final class PhotoCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        stop()
     }
     
     func load(with item: VideoItem) {
-        player = AVPlayer(url: item.compressedURL)
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.frame = frame
-        playerLayer.videoGravity = .resizeAspectFill
+        player = AVQueuePlayer()
+        playerLayer = AVPlayerLayer(player: player)
+        let playerItem = AVPlayerItem(url: item.compressedURL)
+        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
+        player.play()
         
-        self.layer.addSublayer(playerLayer)
+        
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.frame = contentView.frame
+        playerLayer.videoGravity = .resizeAspectFill
+        playerLayer.backgroundColor = UIColor.black.cgColor
+        self.contentView.layer.addSublayer(playerLayer)
         self.playerLayer = playerLayer
+        player?.play()
+    }
+    
+    func stop() {
+        playerLayer?.removeFromSuperlayer()
+        playerLayer = nil
+        player?.pause()
+        playerLooper.disableLooping()
+        player = nil
+    }
+    
+    func play() {
         player?.play()
     }
 }
