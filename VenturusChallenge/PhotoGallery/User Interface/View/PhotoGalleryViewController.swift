@@ -30,8 +30,6 @@ final class PhotoGalleryViewController: UIViewController {
         photoView.didScrollToTheEnd = { [weak self] in
             self?.presenter.didScrollToTheEnd()
         }
-        
-        photoView.showLoadingItems()
     }
     
     func setupNavigationTitle() {

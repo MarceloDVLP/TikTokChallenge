@@ -22,27 +22,13 @@ final class PhotoGalleryView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        collectionView.delegate = self
         collectionView.pinView(in: self)
         collectionView.isPagingEnabled = true
     }
     
-    func cellRegistration() -> UICollectionView.CellRegistration<PhotoCell, VideoItem> {
-        return UICollectionView.CellRegistration<PhotoCell, VideoItem> { (cell, indexPath, item) in
+    func cellRegistration() -> UICollectionView.CellRegistration<VideoCell, VideoItem> {
+        return UICollectionView.CellRegistration<VideoCell, VideoItem> { (cell, indexPath, item) in
             cell.load(with: item)
-            cell.updateCell = { [weak self] item, img in
-
-                guard let self = self else { return }
-                
-                var updatedSnapshot = self.dataSource.snapshot()
-                if let datasourceIndex = updatedSnapshot.indexOfItem(item) {
-                    let item = self.items[datasourceIndex]
-//                    item.image = img
-                    updatedSnapshot.reloadItems([item])
-                    self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
-                    cell.stopShimmeringEffect()
-                }
-            }
         }
     }
     
@@ -77,17 +63,9 @@ final class PhotoGalleryView: UIView {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         snapshot.appendItems(items)
-        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
-    }
-    
-    func showLoadingItems(numberOfItems: Int = 20) {
-        guard !self.items.contains(where: { type(of: $0) == PhotoLoading.self }) else { return }
-        
-        for _ in 0...numberOfItems {
-//            items += [VideoItem()]
-        }
-        
-        applySnapshot(animatingDifferences: false)
+        dataSource.apply(snapshot, animatingDifferences: animatingDifferences, completion: {
+            self.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredVertically, animated: true)
+        })
     }
     
     required init?(coder: NSCoder) {

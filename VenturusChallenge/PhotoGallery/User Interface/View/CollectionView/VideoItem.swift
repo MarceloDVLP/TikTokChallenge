@@ -9,7 +9,10 @@ class VideoItem: Codable, Hashable {
     var username: String
     var compressedURL: URL
     var identifier = UUID()
-        
+    var isFavorite: Bool = false
+    var likes: Int = Int.random(in: 0...999)
+    var favoriteCount: Int = Int.random(in: 0...999)
+    
     enum CodingKeys: String, CodingKey {
         case id
         case songUrl = "song_url"
@@ -25,6 +28,19 @@ class VideoItem: Codable, Hashable {
 
     static func == (lhs: VideoItem, rhs: VideoItem) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    func favorite() {
+        if isFavorite == false {
+            favoriteCount += 1
+        } else {
+            favoriteCount -= 1
+        }
+        self.isFavorite = !isFavorite
+    }
+    
+    func like() {
+        self.likes += 1
     }
 }
 

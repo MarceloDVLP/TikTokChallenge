@@ -16,6 +16,6 @@ final class PhotoGalleryViewControllerBuilder {
         
         router.viewController = viewController
         
-        return UINavigationController(rootViewController: viewController)
+        return viewController
     }
 }
