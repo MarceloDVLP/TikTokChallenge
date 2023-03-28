@@ -1,21 +1,19 @@
 import UIKit
 
-final class PhotoGalleryView: UIView {
+final class FeedView: UIView {
         
     enum Section {
         case main
     }
 
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, VideoItem>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, VideoItem>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, FeedItem>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, FeedItem>
 
     private lazy var collectionView: UICollectionView = {
         return UICollectionView(frame: frame, collectionViewLayout: makeLayoutVideo())
     }()
     
-    var items: [VideoItem] = []
-    
-    var didSelect: ((VideoItem) -> ())?
+    var items: [FeedItem] = []
     var didScrollToTheEnd: (() -> ())?
     
     private lazy var dataSource: DataSource = makeDataSource()
@@ -26,8 +24,8 @@ final class PhotoGalleryView: UIView {
         collectionView.isPagingEnabled = true
     }
     
-    func cellRegistration() -> UICollectionView.CellRegistration<VideoCell, VideoItem> {
-        return UICollectionView.CellRegistration<VideoCell, VideoItem> { (cell, indexPath, item) in
+    func cellRegistration() -> UICollectionView.CellRegistration<FeedCell, FeedItem> {
+        return UICollectionView.CellRegistration<FeedCell, FeedItem> { (cell, indexPath, item) in
             cell.load(with: item)
         }
     }
@@ -35,16 +33,15 @@ final class PhotoGalleryView: UIView {
     func makeDataSource() -> DataSource {
         let cellRegistration = cellRegistration()
         
-        return UICollectionViewDiffableDataSource<Section, VideoItem>(collectionView: collectionView) {
-            
-            (collectionView: UICollectionView, indexPath: IndexPath, item: VideoItem) -> UICollectionViewCell? in
-            
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
-                                                                for: indexPath, item: item)
+        let dataSource =  UICollectionViewDiffableDataSource<Section, FeedItem>(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, item: FeedItem) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration,                                                                 for: indexPath, item: item)
         }
+        
+        return dataSource
     }
     
-    func show(_ items: [VideoItem]) {
+    func show(_ items: [FeedItem]) {
         self.items = items
         applySnapshot(animatingDifferences: true)
     }
@@ -53,8 +50,6 @@ final class PhotoGalleryView: UIView {
         let size = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
         let item = NSCollectionLayoutItem(layoutSize: size)
         let group = NSCollectionLayoutGroup.vertical(layoutSize: size, subitems: [item])
-        
-        // Section
         let section = NSCollectionLayoutSection(group: group)
         return UICollectionViewCompositionalLayout(section: section)
     }
@@ -64,6 +59,7 @@ final class PhotoGalleryView: UIView {
         snapshot.appendSections([.main])
         snapshot.appendItems(items)
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences, completion: {
+            guard self.items.count > 0 else { return }
             self.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredVertically, animated: true)
         })
     }

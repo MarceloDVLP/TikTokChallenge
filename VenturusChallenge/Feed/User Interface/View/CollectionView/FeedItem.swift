@@ -1,6 +1,6 @@
-import UIKit
+import Foundation
 
-class VideoItem: Codable, Hashable {
+class FeedItem: Codable, Hashable {
     
     var id: Int
     var songUrl: URL
@@ -12,6 +12,7 @@ class VideoItem: Codable, Hashable {
     var isFavorite: Bool = false
     var likes: Int = Int.random(in: 0...999)
     var favoriteCount: Int = Int.random(in: 0...999)
+    var page: Int
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -20,13 +21,14 @@ class VideoItem: Codable, Hashable {
         case profileURL = "profile_picture_url"
         case username
         case compressedURL = "compressed_for_ios_url"
+        case page
     }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(identifier)
     }
 
-    static func == (lhs: VideoItem, rhs: VideoItem) -> Bool {
+    static func == (lhs: FeedItem, rhs: FeedItem) -> Bool {
         lhs.id == rhs.id
     }
     
@@ -45,24 +47,5 @@ class VideoItem: Codable, Hashable {
 }
 
 class FeedModel: Codable {
-    var looks: [VideoItem]
-}
-
-final class PhotoLoading: VideoItem {}
-
-extension CGFloat {
-    static func random() -> CGFloat {
-        return CGFloat(arc4random()) / CGFloat(UInt32.max)
-    }
-}
-
-extension UIColor {
-    static func random() -> UIColor {
-        return UIColor(
-           red:   .random(),
-           green: .random(),
-           blue:  .random(),
-           alpha: 1.0
-        )
-    }
+    var looks: [FeedItem]
 }

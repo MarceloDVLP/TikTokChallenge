@@ -1,26 +1,27 @@
 import Foundation
 
-protocol RemoteServiceProtocol {
-    func fetch()-> [VideoItem]
+protocol FeedInteractorProtocol {
+    func fetch() -> [FeedItem]
 }
 
-final class RemoteService: RemoteServiceProtocol {
+final class FeedInteractor: FeedInteractorProtocol {
+    
+    var items: [FeedItem] = []
+    var page: Int = 0
         
-    func fetch()-> [VideoItem] {
+    func fetch()-> [FeedItem] {
         if let url = Bundle.main.url(forResource: "Feed", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
                 let decoder = JSONDecoder()
                 let jsonData = try decoder.decode(FeedModel.self, from: data)
-                return jsonData.looks
+                self.items = jsonData.looks
+                page += 1
+                return items
             } catch {
                 print("error:\(error)")
             }
         }
         return []
     }
-}
-
-enum RemoteServiceError: Error, Equatable {
-    case serverError
 }

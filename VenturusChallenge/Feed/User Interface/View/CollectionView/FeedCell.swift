@@ -1,11 +1,10 @@
 import UIKit
-import AVFoundation
 
-final class VideoCell: UICollectionViewCell {
+final class FeedCell: UICollectionViewCell {
     
     private var videoPlayer = VideoPlayer()
     private var task: URLSessionDataTask?
-    private var item: VideoItem?
+    private var item: FeedItem?
     
     private lazy var userLabel = {
         let userLabel = UILabel()
@@ -29,6 +28,7 @@ final class VideoCell: UICollectionViewCell {
         profileImageView.translatesAutoresizingMaskIntoConstraints = false
         profileImageView.clipsToBounds = true
         profileImageView.contentMode = .scaleAspectFit
+        profileImageView.layer.cornerRadius = 24
         return profileImageView
     }()
     
@@ -53,7 +53,6 @@ final class VideoCell: UICollectionViewCell {
         countHeartLabel.translatesAutoresizingMaskIntoConstraints = false
         countHeartLabel.font = UIFont.boldSystemFont(ofSize: 18)
         countHeartLabel.textColor = .white
-        countHeartLabel.text = "23"
         return countHeartLabel
     }()
     
@@ -62,7 +61,6 @@ final class VideoCell: UICollectionViewCell {
         countLikeLabel.translatesAutoresizingMaskIntoConstraints = false
         countLikeLabel.font = UIFont.boldSystemFont(ofSize: 18)
         countLikeLabel.textColor = .white
-        countLikeLabel.text = "492"
         return countLikeLabel
     }()
     
@@ -90,12 +88,7 @@ final class VideoCell: UICollectionViewCell {
         item = nil
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        profileImageView.layer.cornerRadius = 24
-    }
-    
-    func load(with item: VideoItem) {
+    func load(with item: FeedItem) {
         self.item = item
         videoPlayer.play(item.compressedURL, in: contentView)
         titleLabel.text = item.body
@@ -110,7 +103,7 @@ final class VideoCell: UICollectionViewCell {
         }
         
         countLikeLabel.text = String(item.likes)
-        countHeartLabel.text = String(item.favoriteCount)
+        countHeartLabel.text = String(item.favoriteCount)                
     }
     
     func bringSubviewsToFront() {
@@ -189,8 +182,26 @@ final class VideoCell: UICollectionViewCell {
         
         likeImageView.isUserInteractionEnabled = true
         likeImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapLike)))
+        
+        let leftSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeLeft))
+        leftSwipeGesture.direction = .left
+        contentView.addGestureRecognizer(leftSwipeGesture)
+        contentView.isUserInteractionEnabled = true
+
+        let rightSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeRight))
+        rightSwipeGesture.direction = .right
+        contentView.addGestureRecognizer(rightSwipeGesture)
+        contentView.isUserInteractionEnabled = true
     }
     
+    @objc func didSwipeLeft(sender: UISwipeGestureRecognizer) {
+        didTapFavorite()
+    }
+
+    @objc func didSwipeRight(sender: UISwipeGestureRecognizer) {
+        didTapLike()
+    }
+
     @objc func didTapFavorite() {
         guard let item = self.item else { return }
         item.favorite()
@@ -211,30 +222,3 @@ final class VideoCell: UICollectionViewCell {
 }
 
 
-final class VideoPlayer {
-
-    var playerLooper: AVPlayerLooper?
-    weak var player: AVPlayer?
-    
-    func play(_ url: URL, in view: UIView) {
-        let playerItem = AVPlayerItem(url: url)
-        let player = AVQueuePlayer()
-        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
-        self.player = player
-        show(player, view)
-    }
-    
-    func stop() {
-        playerLooper?.disableLooping()
-        player?.pause()
-    }
-    
-    private func show(_ player: AVPlayer,  _ view: UIView) {
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
-        playerLayer.frame = view.frame
-        let position: UInt32 = UInt32((view.layer.sublayers?.count) ?? 0)
-        view.layer.insertSublayer(playerLayer, at: position)
-        player.play()
-    }
-}
