@@ -1,10 +1,3 @@
-//
-//  SceneDelegate.swift
-//  VenturusChallenge
-//
-//  Created by Marcelo Carvalho on 14/02/23.
-//
-
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {

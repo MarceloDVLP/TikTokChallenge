@@ -24,15 +24,12 @@ each layer use protocols to talk to another, so it's pretty simple to test them 
 
 ## App Features
 
-The app has two main features:
+features
 
-1) The Photo Gallery: Lists photos on a collectionView and paginate the API when user scrolls to the end of list.
+1) FeedViewController with videos
 
-2) The Photo Detail: Shows the detail of an item 
+2) User gestures to swipe videos and reactions 
 
-## Network Layer
-
-For the networking layer I used a simple implementation with URLSessions.
 
 
 ## User Interface
@@ -40,9 +37,6 @@ For the networking layer I used a simple implementation with URLSessions.
 I used a UICollectionView to build the UI, using a modern aproach with UICollectionViewDiffableDataSource and NSDiffableDataSourceSnapshot to manage our CollectionView's data and updates! That's very powerful and save us from many lines of code. 
 
 Also, I used a UICollectionViewCompositionalLayout, a modern aproach to build the CollectionView layout! 
-
-We create a class (ImageCache.swift) to manage and cache the images data in memory, creating an amazing smooth experience while the users scrolls our collection : )
-
 
 
 ## App Entry Point
